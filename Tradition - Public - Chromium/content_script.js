@@ -19,7 +19,7 @@ var target = document.getElementsByClassName('ic-app-header__logomark')[0];
 document.getElementsByClassName('ic-app-header__logomark-container')[0].insertBefore(elem, target); 
 document.getElementsByClassName('ic-app-header__logomark')[0].remove();
 //window.addEventListener("load", function() {
-  document.getElementsByClassName('ic-sidebar-logo__image')[0].src = chrome.runtime.getURL("images/long.png");
+//document.getElementsByClassName('ic-sidebar-logo__image')[0].src = chrome.runtime.getURL("images/long.png");
 //});
 document.getElementById("primaryNavToggle").onclick = function(){
   if(!document.getElementById("primaryNavToggle").title.startsWith("Expand global navigation")){
@@ -76,54 +76,10 @@ window.addEventListener("load", function() {
 });
 */
 
-// Zoom Integration
-window.addEventListener("load", function() {
-  if(document.getElementsByClassName("hidden-phone")[0].innerHTML == "Dashboard"){
-    var bjlButton = document.getElementById("planner-today-btn").cloneNode(true);
-    bjlButton.id = "bjl";
-    bjlButton.style.background="#0066ff";
-    bjlButton.style.color="#ffffff";
-    while (bjlButton.firstChild) {
-      bjlButton.removeChild(bjlButton.firstChild);
-    }
-    bjlButton.innerHTML = "BlueJeans";
-    document.getElementsByClassName("PlannerHeader-styles__root PlannerHeader")[0].appendChild(bjlButton);
-  }
-  else{
-    var bjlButton = document.getElementById("create_new_event_link").cloneNode(true);
-    bjlButton.id = "bjl";
-    bjlButton.style.background="#0066ff";
-    bjlButton.style.color="#ffffff";
-    bjlButton.removeAttribute("href");
-    bjlButton.removeAttribute("title");
-    while (bjlButton.firstChild) {
-      bjlButton.removeChild(bjlButton.firstChild);
-    }
-    bjlButton.innerHTML = "BlueJeans";
-    document.getElementsByClassName("header-bar-right header-right-flex")[0].appendChild(bjlButton);
-  }
-  var bjlState = 0;
-  document.getElementById("bjl").addEventListener("click",function() {
-    if(bjlState == 0){
-      Array.from(document.getElementsByClassName("fc-event")).filter(lits => lits.title.includes('BlueJeans Meeting:')).forEach(item => item.style.display = "none");
-      Array.from(document.getElementsByClassName("agenda-event__item-container")).filter(li => li.getElementsByClassName("agenda-event__title")[0].innerHTML.includes('BlueJeans Meeting:')).forEach(item => item.style.display = "none");
-      Array.from(document.getElementsByClassName("PlannerItem-styles__root planner-item")).filter(lits => lits.getElementsByClassName("ergWt_bGBk")[0].innerHTML.includes('BlueJeans Meeting:')).forEach(item => item.style.display = "none");
-      bjlState = 1;
-    }
-    else{
-      Array.from(document.getElementsByClassName("fc-event")).filter(lits => lits.title.includes('BlueJeans Meeting:')).forEach(item => item.style.display = "block");
-      Array.from(document.getElementsByClassName("agenda-event__item-container")).filter(li => li.getElementsByClassName("agenda-event__title")[0].innerHTML.includes('BlueJeans Meeting:')).forEach(item => item.style.display = "flex");
-      Array.from(document.getElementsByClassName("PlannerItem-styles__root planner-item")).filter(lits => lits.getElementsByClassName("ergWt_bGBk")[0].innerHTML.includes('BlueJeans Meeting:')).forEach(item => item.style.display = "flex");
-      bjlState = 0;
-    }
-  });
-});
-
-
 // Optimize Feature
 function charlie(){
   try{
-    console.log("Optimizing");
+    //console.log("Optimizing");
     var wei  = Array.from(document.getElementsByClassName("summary")[0].getElementsByTagName("th")).filter(ini => ini.scope == "row");
     var nams = [];
     var weist = [];
@@ -136,15 +92,12 @@ function charlie(){
     }
     var graded = Array.from(document.getElementsByClassName("student_assignment editable")).filter(ini => ini.getElementsByClassName("toggle_final_grade_info tooltip")[0].style.visibility == 'hidden');
     graded.forEach(ini => ini.getElementsByClassName("student_entered_score")[0].innerHTML = "");
-    var grades = new Array(nams.length-1);
-    var grades1 = new Array(nams.length-1);
-    for(i = 0;i < nams.length;i++){
-      grades[i] = 0;
-      grades1[i] = 0;
-    }
+    var grades = new Array(nams.length).fill(0);
+    //console.log(grades);
+    var grades1 = new Array(nams.length).fill(0);
     var j = 0;
     var c = 0.0;
-    var q = Array(nams.length).fill(0);
+    var q = new Array(nams.length).fill(0);
     for(i=0; i < graded.length; i++){
       q[nams.indexOf(graded[i].getElementsByClassName("context")[0].innerHTML)] = 1;
     }  
@@ -152,13 +105,17 @@ function charlie(){
     div = (a, b) => a.map((x, i) => a[i] / b);
     mul = (a, b) => a.map((x, i) => a[i] * b[i])
     var tot = dot(q,weist);
-    console.log(weist);
+    //console.log(weist);
     weist = div(weist,tot);
     weist = mul(weist,q);
+    //console.log(grades1);
     for(i = 0;i < graded.length;i++){
       j = nams.indexOf(graded[i].getElementsByClassName("context")[0].innerHTML);
-      c = parseFloat(graded[i].getElementsByClassName("original_points")[0].innerHTML);
-      d = parseFloat(graded[i].getElementsByClassName("possible points_possible")[0].innerHTML);
+      c = isNaN(parseFloat(graded[i].getElementsByClassName("original_points")[0].innerHTML)) ? 0 : parseFloat(graded[i].getElementsByClassName("original_points")[0].innerHTML);
+      d = isNaN(parseFloat(graded[i].getElementsByClassName("possible points_possible")[0].innerHTML)) ? 0 : parseFloat(graded[i].getElementsByClassName("possible points_possible")[0].innerHTML);
+      //console.log(d);
+      //console.log(grades1);
+      ////console.log(c);
       if(isNaN(c)){  
         grades[j] += 0.0;
         grades1[j] += d;
@@ -168,6 +125,7 @@ function charlie(){
         grades1[j] += d;
       }
       if(i == graded.length - 1){
+        //console.log(grades1);
         for(j = 0;j < grades.length;j++){
           if(grades1[j] != 0){
             grades[j] = grades[j]/grades1[j];
@@ -177,6 +135,9 @@ function charlie(){
     }
     add = (a, b) => a.map((x, i) => a[i] + b[i]);
     var result = .9 - dot(grades,weist);
+    //console.log(nams);
+    //console.log(grades1);
+    //console.log(weist);
     console.log(result);
     if(result > 0){
       var graded3 = Array.from(document.getElementsByClassName("student_assignment editable")).filter(ini => !ini.classList.contains("assignment_graded")).filter(ini => ini.getElementsByClassName("toggle_final_grade_info tooltip")[0].style.visibility == 'hidden');
@@ -186,7 +147,7 @@ function charlie(){
       var maskT = new Array(nams.length).fill(0);
       for(i = 0;i < graded3.length;i ++){
         j = nams.indexOf(graded3[i].getElementsByClassName("context")[0].innerHTML); 
-        possi = parseFloat(graded3[i].getElementsByClassName("possible points_possible")[0].innerHTML);
+        possi = isNaN(parseFloat(graded3[i].getElementsByClassName("possible points_possible")[0].innerHTML)) ? 0 : parseFloat(graded3[i].getElementsByClassName("possible points_possible")[0].innerHTML);
         maskT[j] += possi;
         total += possi;
       }
@@ -197,11 +158,11 @@ function charlie(){
         maskT[i] /= total;
         }
       }
-      console.log(maskT);
+      //console.log(maskT);
       mat.fill(0);
       ma.fill(0);
       var res = 0;
-      console.log(weist);
+      //console.log(weist);
       if(dot(maskT, weist) != 0){
         while(res < result){
           mat = add(mat, maskT);
@@ -211,7 +172,7 @@ function charlie(){
             }
           }
           res = dot(ma, weist);
-          console.log("Point");
+          //console.log("Point");
         }
       }
       var flag = true;
@@ -222,7 +183,7 @@ function charlie(){
         space = 0;
         for(j = 0;j < graded3.length;j++){
           if(graded3[j].getElementsByClassName("context")[0].innerHTML == nams[i]) {
-            space = parseFloat(graded3[j].getElementsByClassName("possible points_possible")[0].innerHTML);
+            space = isNaN(parseFloat(graded3[j].getElementsByClassName("possible points_possible")[0].innerHTML)) ? 0 : parseFloat(graded3[j].getElementsByClassName("possible points_possible")[0].innerHTML);
             if(mat[i] < space){
               graded3[j].getElementsByClassName("student_entered_score")[0].innerHTML = mat[i];
               mat[i] = 0;
@@ -231,7 +192,7 @@ function charlie(){
               graded3[j].getElementsByClassName("student_entered_score")[0].innerHTML = space;
               mat[i] = mat[i] - space;
             }
-            console.log("Sent");
+            //console.log("Sent");
           }
         }
       }
@@ -303,7 +264,8 @@ function charlie(){
       alert("Projected Grade Is Already An A");
     }
   }
-  catch{
+  catch (err) {
+    console.error(err.message);
     //Optimize Part 2
     var run = false;
     chrome.storage.sync.get('classes', function(result) {
@@ -321,8 +283,8 @@ function charlie(){
       }
       breakme: {
         if(run){
-          console.log(classData);
-          console.log("Optimizing 2");
+          //console.log(classData);
+          //console.log("Optimizing 2");
           var nams = [];
           var weist = [];
           for(var i = 1; i < classData[inx].length; i++){
@@ -351,18 +313,19 @@ function charlie(){
           }  
           dot = (a, b) => a.map((x, i) => a[i] * b[i]).reduce((m, n) => m + n);
           div = (a, b) => a.map((x, i) => a[i] / b);
-          mul = (a, b) => a.map((x, i) => a[i] * b[i])
-          console.log("Grades");
-          console.log(grades);
-          console.log(weist);
-          console.log(nams);
+          mul = (a, b) => a.map((x, i) => a[i] * b[i]);
+          //console.log("Grades");
+          //console.log(grades);
+          //console.log(weist);
+          //console.log(nams);
           var tot = dot(q,weist);
           weist = div(weist,tot);
           weist = mul(weist,q);
           for(i = 0;i < graded.length;i++){
             j = nams.indexOf(graded[i].getElementsByClassName("context")[0].innerHTML);
-            c = parseFloat(graded[i].getElementsByClassName("original_points")[0].innerHTML);
-            d = parseFloat(graded[i].getElementsByClassName("possible points_possible")[0].innerHTML);
+            c = isNaN(parseFloat(graded[i].getElementsByClassName("original_points")[0].innerHTML)) ? 0 : parseFloat(graded[i].getElementsByClassName("original_points")[0].innerHTML);
+            d = isNaN(parseFloat(graded[i].getElementsByClassName("possible points_possible")[0].innerHTML)) ? 0 : parseFloat(graded[i].getElementsByClassName("possible points_possible")[0].innerHTML);
+            //console.log(d);
             if(isNaN(c)){  
               grades[j] += 0.0;
               grades1[j] += d;
@@ -382,7 +345,7 @@ function charlie(){
           var totalw = .9 * weist.reduce((partialSum, a) => partialSum + a, 0);
           add = (a, b) => a.map((x, i) => a[i] + b[i]);
           var result = totalw - dot(grades,weist);
-          console.log(result);
+          //console.log(result);
           if(result > 0){
             var graded3 = Array.from(document.getElementsByClassName("student_assignment editable")).filter(ini => !ini.classList.contains("assignment_graded")).filter(ini => ini.getElementsByClassName("toggle_final_grade_info tooltip")[0].style.visibility == 'hidden');
             var mat = new Array(nams.length);
@@ -410,12 +373,12 @@ function charlie(){
                   }
                 }
                 res = dot(ma, weist);
-                console.log("Point");
+                //console.log("Point");
               }
             }
             var flag = true;
             var space = 0;
-            console.log(mat);
+            //console.log(mat);
             for(i = 0;i < mat.length;i++){
               flag = true;
               space = 0;
@@ -430,7 +393,7 @@ function charlie(){
                     graded3[j].getElementsByClassName("student_entered_score")[0].innerHTML = space;
                     mat[i] = mat[i] - space;
                   }
-                  console.log("Sent");
+                  //console.log("Sent");
                 }
               }
             }
@@ -515,8 +478,8 @@ function charlie(){
           //Focus Dialog Box (Not Yet possible)
           //.openPopup works for firefox
           chrome.storage.sync.set({names: nams}, function() {
-            console.log('Names Array Sent to popup');
-            console.log(nams);
+            //console.log('Names Array Sent to popup');
+            //console.log(nams);
           });
           browser.browserAction.openPopup();
         } 
